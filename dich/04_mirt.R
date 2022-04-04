@@ -56,3 +56,6 @@ structure(c(-0.00083072870999166255, -0.0018789890320939204,
 "State Assessment 5", "State Assessment 3", "State Assessment 4", 
 "Lexile 8", "Multiply/Divide", "LSAT", "Add/Subtract", "Letter Chaos", 
 "PIAAC US", "ECLS DCCS"), NULL))
+
+library(xtable)
+print(xtable(tab0,digits=2,display=c("f","e")))

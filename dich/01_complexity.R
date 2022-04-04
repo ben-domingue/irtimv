@@ -151,6 +151,8 @@ twopl = 0.01027227230134679, threepl = 0.0021661228280709585),
 tab0<-do.call("rbind",tab)
 tab0<-rbind(tab0,colMeans(tab0))
 
+cor(abs(tab0[,3]-.5),tab0[,4])
+
 
 library(xtable)
 print(xtable(tab0,digits=2,display=c("f","d","d","f","e","e","e","e")))
