@@ -1,18 +1,18 @@
+##looking at the variation in discriminations
+
 parfun<-function(args) {
     library(irtimv)
     sim<-function(np,a=NULL,J=15,K=5,KK) {
         th<-rnorm(np)
         if (is.null(a)) a<-rep(1,J)
         L<-list()
-        bb<-seq(-2.5,2.5,length.out=KK-1)
-        b<-sort(sample(bb,K-1))
         for (j in 1:J) { #over items
-            b.offset<-rnorm(1)
-            bloc<-b.offset+b
+            bb<-seq(-2.5,2.5,length.out=KK-1)
+            b<-sort(sample(bb,K-1))
             psi<-list()
             psi[[1]]<-rep(1,length(th))
             for (k in 1:(K-1)) {
-                kern<-k*th-sum(bloc[1:k])
+                kern<-k*th-sum(b[1:k])
                 psi[[k+1]]<-exp(a[j]*kern)
             }
             psi<-do.call("cbind",psi)
