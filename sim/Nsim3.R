@@ -132,6 +132,7 @@ for (ii in 1:length(tabL)) {
         tmp<-cbind(m$x,m$fitted)
         tmp<-tmp[order(tmp[,1]),]
         lines(tmp,col=cols[i],lwd=2)
+        if (txt=="Rasch") txt<-"1PL"
         text(tmp[nrow(tmp),1],tmp[nrow(tmp),2],txt,cex=.7,col=col,pos=4)
     }
     for (i in 1:length(L)) {
@@ -170,7 +171,9 @@ for (ii in 1:length(tabL)) {
         tmp<-cbind(m$x,m$fitted)
         tmp<-tmp[order(tmp[,1]),]
         lines(tmp,col=cols[i],lwd=2)
-        text(tmp[nrow(tmp),1],tmp[nrow(tmp),2],names(L)[i],cex=.7,col=cols[i],pos=4)
+        txt<-names(L)[i]
+        if (txt=="Rasch") txt<-"1PL"
+        text(tmp[nrow(tmp),1],tmp[nrow(tmp),2],txt,cex=.7,col=cols[i],pos=4)
     }
     mtext(side=3,line=0,paste(names(tabL)[ii],"items"))
     ##

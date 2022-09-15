@@ -151,7 +151,7 @@ f1<-function(tab,nitem) {
     zz<-lapply(zz,colMeans)
     z<-data.frame(do.call("rbind",zz))
     ##
-    plot(NULL,xlim=c(1,nrow(z)+2.3),ylim=c(-.002,.015),xlab="",xaxt="n",ylab="IMV")
+    plot(NULL,xlim=c(1,nrow(z)+2.3),ylim=c(-.002,.008),xlab="",xaxt="n",ylab="IMV")
     #for (i in seq(-.01,.025,by=.005)) abline(h=i,lwd=1,col='gray')
     abline(h=0,col='gray')
     axis(side=1,at=1:nrow(z),labels=rep("",nrow(z)))
@@ -164,9 +164,9 @@ f1<-function(tab,nitem) {
     mtext(side=1,at=1:nrow(z),round(z$mad,3),line=3.75,cex=1)
     mtext(side=1,line=3.75,at=nrow(z)+1.3,"MAD",cex=1)
     ##
-    lines(1:nrow(z),z$om2,type='b',col='blue',lwd=2,pch=19)
-    lines(1:nrow(z),z$om3,type='b',col='red',lwd=2,pch=19)
-    lines(1:nrow(z),z$om3a,type='b',col='green',lwd=2,pch=19)
+    points(1:nrow(z),z$om2,col='blue',pch=19)
+    points(1:nrow(z),z$om3,col='red',pch=19)
+    points(1:nrow(z),z$om3a,col='green',pch=19)
                                         #text(nrow(z),z$om2[nrow(z)],pos=4,paste("IMV(1,2),N=",substr(names(L)[i],1,1),"K",sep=""),col='blue',cex=.75)
                                         #text(nrow(z),z$om3[nrow(z)],pos=4,paste("IMV(2,3),N=",substr(names(L)[i],1,1),"K",sep=""),col='red',cex=.75)
     text(nrow(z),z$om2[nrow(z)],pos=4,paste("IMV(1,2)",sep=""),col='blue',cex=.75)

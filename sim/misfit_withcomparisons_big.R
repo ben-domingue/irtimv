@@ -201,19 +201,23 @@ pfouter<-function(z,xx.name,...) {
 }
 ##
 names<-list("RMSEA"="RMSEA", "AIC delta"="AIC difference", "Likelihood Ratio Test"="-log10(p, LRT)", "IMV change"="IMV change")
-metrics<-c("RMSEA","AIC delta","Likelihood Ratio Test","IMV change")
+metrics<-c("RMSEA","AIC delta",#"Likelihood Ratio Test",
+           "IMV change")
 
-pdf("/home/bd/Dropbox/Apps/Overleaf/IMV_IRT/misfit_slope.pdf",width=6,height=7)
+pdf("/home/bd/Dropbox/Apps/Overleaf/IMV_IRT/misfit_slope.pdf",width=6,height=2.5)
 load("misfit_slope.Rdata")
 x<-tab.slope
+##
+x<-x[x$diff==0,]
+##
 x$value<-ifelse(x$metric=="Likelihood Ratio Test",-log10(x$value),x$value)
-par(mfcol=c(length(metrics),3),mar=c(1,1,1,1),mgp=c(2,1,0),oma=c(6,6,1,1))
+par(mfcol=c(1,3),mar=c(3,3,1,1),mgp=c(2,1,0),oma=rep(.5,4))
 diff<-unique(x$diff)
 for (d in diff) {
     for (metric in metrics) {
         z<-x[x$metric==metric & x$diff==d,]
         cols<-pfouter(z,xx.name="sd",xl=c(0,.5),xlab=expression(sigma),ylim=range(x$value[x$metric==metric],na.rm=TRUE))
-        if (metric==metrics[1]) mtext(side=3,line=0,bquote(mu[b]~"="~.(d))) #paste("Mean difficulty",d))
+        #mtext(side=3,line=0,bquote(mu[b]~"="~.(d))) #paste("Mean difficulty",d))
         ##legend
         if (d==diff[1]) {
             pos<-"topleft"
@@ -229,9 +233,9 @@ for (d in diff) {
             axis(side=2)
             mtext(side=2,names[[metric]],line=2)
         }
+        axis(side=1)
     }
-    axis(side=1)
-    mtext(side=1,expression(sigma),line=2)
+    #mtext(side=1,expression(sigma),line=2)
 }
 dev.off()
 

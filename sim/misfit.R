@@ -129,11 +129,86 @@ save(tab,file="misfit.Rdata")
 
 
 ###################################################
-f1<-function(tab,nitem) {
+## f1<-function(tab,nitem) { #continuous lines
+##     z<-do.call("rbind",tab)
+##     z<-data.frame(z)
+##     ##
+##     zz<-split(z,paste(z$n,z$sd,z$gm))
+##     zz<-lapply(zz,colMeans)
+##     z<-data.frame(do.call("rbind",zz))
+##     ##
+##     L<-split(z,z$n)
+##     z<-L[[1]] #just for configuring the plot
+##     plot(NULL,xlim=c(1,nrow(z)+2.3),ylim=c(-.002,.017),xlab="",xaxt="n",ylab="IMV")
+##     #for (i in seq(-.01,.025,by=.005)) abline(h=i,lwd=1,col='gray')
+##     abline(h=0,col='gray')
+##     axis(side=1,at=1:nrow(z),labels=rep("",nrow(z)))
+##     mtext(side=1,at=1:nrow(z),z$sd,line=.75,cex=.5)
+##     mtext(side=1,line=.75,at=nrow(z)+1.3,expression(sigma),cex=.5)
+##     mtext(side=1,at=1:nrow(z),z$gm,line=1.75,cex=.5)
+##     mtext(side=1,line=1.75,at=nrow(z)+1.3,"C",cex=.5)
+##     ##
+##     for (i in 1:length(L)) {
+##         z<-L[[i]]
+##         lines(1:nrow(z),z$om2,type='b',col='blue',lwd=2,pch=19,lty=i)
+##         lines(1:nrow(z),z$om3,type='b',col='red',lwd=2,pch=19,lty=i)
+##         #text(nrow(z),z$om2[nrow(z)],pos=4,paste("IMV(1,2),N=",substr(names(L)[i],1,1),"K",sep=""),col='blue',cex=.75)
+##         #text(nrow(z),z$om3[nrow(z)],pos=4,paste("IMV(2,3),N=",substr(names(L)[i],1,1),"K",sep=""),col='red',cex=.75)
+##         text(nrow(z),z$om2[nrow(z)],pos=4,paste("IMV(1,2)",sep=""),col='blue',cex=.75)
+##         text(nrow(z),z$om3[nrow(z)],pos=4,paste("IMV(2,3)",sep=""),col='red',cex=.75)
+##         z2<-z[z$gm==.3,]
+##         print(z2)
+##         print(summary(z2$om2/z2$om3))
+##     }
+##     mtext(side=3,line=0,paste(nitem," items"))
+##     ##
+## }
+## ##
+## f2<-function(tab,nitem) {
+##     z<-do.call("rbind",tab)
+##     z<-data.frame(z)
+##     z<-z[z$n==1000,]
+##     ##
+##     zz<-split(z,paste(z$n,z$sd,z$gm))
+##     zz<-lapply(zz,colMeans)
+##     z<-data.frame(do.call("rbind",zz))
+##     ##
+##     L<-split(z,z$n)
+##     z<-L[[1]] #just for configuring the plot
+##     plot(NULL,xlim=c(1,nrow(z)+2.3),ylim=c(-.05,.05),xlab="",xaxt="n",ylab="IMV")
+##     for (i in seq(-.025,.025,by=.025)) abline(h=i,lwd=1,col='gray')
+##     axis(side=1,at=1:nrow(z),labels=rep("",nrow(z)))
+##     mtext(side=1,at=1:nrow(z),z$sd,line=.75,cex=.5)
+##     mtext(side=1,line=.75,at=nrow(z)+1.3,expression(sigma),cex=.5)
+##     mtext(side=1,at=1:nrow(z),z$gm,line=1.75,cex=.5)
+##     mtext(side=1,line=1.75,at=nrow(z)+1.3,"C",cex=.5)
+##     ##
+##     for (i in 1:length(L)) {
+##         z<-L[[i]]
+##         lines(1:nrow(z),z$or.r,type='b',col='blue',lwd=2,pch=19,lty=1)
+##         lines(1:nrow(z),z$or.2,type='b',col='red',lwd=2,pch=19,lty=1)
+##         lines(1:nrow(z),z$or.3,type='b',col='black',lwd=2,pch=19,lty=1,cex=.5)
+##         text(nrow(z),z$or.r[nrow(z)],pos=4,paste("Oracle 1"),col='blue',cex=.75)
+##         text(nrow(z),z$or.2[nrow(z)],pos=4,paste("Oracle 2"),col='red',cex=.75)
+##         text(nrow(z),z$or.3[nrow(z)],pos=4,paste("Oracle 3"),col='black',cex=.75)
+##         ##
+##         lines(1:nrow(z),z$of.r,type='b',col='blue',lwd=2,pch=19,lty=3)
+##         lines(1:nrow(z),z$of.2,type='b',col='red',lwd=2,pch=19,lty=3)
+##         lines(1:nrow(z),z$of.3,type='b',col='black',lwd=2,pch=19,lty=3,cex=.5)
+##         text(nrow(z),z$of.r[nrow(z)],pos=4,paste("Overfit 1"),col='blue',cex=.75)
+##         text(nrow(z),z$of.2[nrow(z)],pos=4,paste("Overfit 2"),col='red',cex=.75)
+##         text(nrow(z),z$of.3[nrow(z)],pos=4,paste("Overfit 3"),col='black',cex=.75)
+##     }
+##     mtext(side=3,line=0,paste(nitem," items"))
+##     ##
+## }
+
+f1<-function(tab,nitem) { #error bars
     z<-do.call("rbind",tab)
     z<-data.frame(z)
     ##
     zz<-split(z,paste(z$n,z$sd,z$gm))
+    zz.ci<-lapply(zz,function(x) apply(x,2,quantile,c(.025,.975)))
     zz<-lapply(zz,colMeans)
     z<-data.frame(do.call("rbind",zz))
     ##
@@ -150,8 +225,14 @@ f1<-function(tab,nitem) {
     ##
     for (i in 1:length(L)) {
         z<-L[[i]]
-        lines(1:nrow(z),z$om2,type='b',col='blue',lwd=2,pch=19,lty=i)
-        lines(1:nrow(z),z$om3,type='b',col='red',lwd=2,pch=19,lty=i)
+        points(1:nrow(z),z$om2,col='blue',pch=19)
+        points(1:nrow(z),z$om3,col='red',pch=19)
+        ##
+        for (j in 1:length(zz.ci)) {
+            yy<-as.data.frame(zz.ci[[j]])
+            segments(j,yy$om2[1],j,yy$om2[2],col='blue')
+            segments(j,yy$om3[1],j,yy$om3[2],col='red')
+        }
         #text(nrow(z),z$om2[nrow(z)],pos=4,paste("IMV(1,2),N=",substr(names(L)[i],1,1),"K",sep=""),col='blue',cex=.75)
         #text(nrow(z),z$om3[nrow(z)],pos=4,paste("IMV(2,3),N=",substr(names(L)[i],1,1),"K",sep=""),col='red',cex=.75)
         text(nrow(z),z$om2[nrow(z)],pos=4,paste("IMV(1,2)",sep=""),col='blue',cex=.75)
@@ -175,7 +256,7 @@ f2<-function(tab,nitem) {
     ##
     L<-split(z,z$n)
     z<-L[[1]] #just for configuring the plot
-    plot(NULL,xlim=c(1,nrow(z)+2.3),ylim=c(-.05,.05),xlab="",xaxt="n",ylab="IMV")
+    plot(NULL,xlim=c(1,nrow(z)+2.3),ylim=c(-.03,.035),xlab="",xaxt="n",ylab="IMV")
     for (i in seq(-.025,.025,by=.025)) abline(h=i,lwd=1,col='gray')
     axis(side=1,at=1:nrow(z),labels=rep("",nrow(z)))
     mtext(side=1,at=1:nrow(z),z$sd,line=.75,cex=.5)
@@ -185,19 +266,19 @@ f2<-function(tab,nitem) {
     ##
     for (i in 1:length(L)) {
         z<-L[[i]]
-        lines(1:nrow(z),z$or.r,type='b',col='blue',lwd=2,pch=19,lty=1)
-        lines(1:nrow(z),z$or.2,type='b',col='red',lwd=2,pch=19,lty=1)
-        lines(1:nrow(z),z$or.3,type='b',col='black',lwd=2,pch=19,lty=1,cex=.5)
+        points(1:nrow(z),z$or.r,col='blue',pch=19,cex=2)
+        points(1:nrow(z),z$or.2,col='red',pch=19,cex=2)
+        points(1:nrow(z),z$or.3,col='black',pch=19,cex=1)
         text(nrow(z),z$or.r[nrow(z)],pos=4,paste("Oracle 1"),col='blue',cex=.75)
         text(nrow(z),z$or.2[nrow(z)],pos=4,paste("Oracle 2"),col='red',cex=.75)
-        text(nrow(z),z$or.3[nrow(z)],pos=4,paste("Oracle 3"),col='black',cex=.75)
+        text(nrow(z),z$or.3[nrow(z)],pos=1,paste("Oracle 3"),col='black',cex=.75)
         ##
-        lines(1:nrow(z),z$of.r,type='b',col='blue',lwd=2,pch=19,lty=3)
-        lines(1:nrow(z),z$of.2,type='b',col='red',lwd=2,pch=19,lty=3)
-        lines(1:nrow(z),z$of.3,type='b',col='black',lwd=2,pch=19,lty=3,cex=.5)
+        points(1:nrow(z),z$of.r,col='blue',pch=1,cex=2)
+        points(1:nrow(z),z$of.2,col='red',pch=1,cex=2)
+        points(1:nrow(z),z$of.3,col='black',pch=1,cex=1)
         text(nrow(z),z$of.r[nrow(z)],pos=4,paste("Overfit 1"),col='blue',cex=.75)
         text(nrow(z),z$of.2[nrow(z)],pos=4,paste("Overfit 2"),col='red',cex=.75)
-        text(nrow(z),z$of.3[nrow(z)],pos=4,paste("Overfit 3"),col='black',cex=.75)
+        text(nrow(z),z$of.3[nrow(z)],pos=1,paste("Overfit 3"),col='black',cex=.75)
     }
     mtext(side=3,line=0,paste(nitem," items"))
     ##
@@ -205,21 +286,27 @@ f2<-function(tab,nitem) {
 
 
 
-pdf("/home/bd/Dropbox/Apps/Overleaf/IMV_IRT/misfit.pdf",width=7.5,height=5)
+pdf("/home/bd/Dropbox/Apps/Overleaf/IMV_IRT/misfitA2.pdf",width=7.5,height=2.5)
 load("misfit.Rdata")
 numitems<-c(25,50,200)
-par(mfrow=c(2,3),mgp=c(2,1,0),mar=c(3,3,1.3,.1),oma=rep(0,4),bty='n')
+par(mfrow=c(1,3),mgp=c(2,1,0),mar=c(3,3,1.3,.1),oma=rep(0,4),bty='n')
 for (i in 1:length(tab)) f1(tab[[i]],nitem=numitems[i])
+dev.off()
+
+pdf("/home/bd/Dropbox/Apps/Overleaf/IMV_IRT/misfitB.pdf",width=7.5,height=2.5)
+load("misfit.Rdata")
+numitems<-c(25,50,200)
+par(mfrow=c(1,3),mgp=c(2,1,0),mar=c(3,3,1.3,.1),oma=rep(0,4),bty='n')
 for (i in 1:length(tab)) f2(tab[[i]],nitem=numitems[i])
 dev.off()
 
+load("misfit.Rdata")
 f<-function(tab) {
     z<-do.call("rbind",tab)
     z<-data.frame(z)
-    print(summary(z$om0))
-    print(summary(z$omctt))
-    NULL
+    c(mean(z$om0),mean(z$omctt))
 }
-lapply(tab,f)
+z<-sapply(tab,f)
+rowMeans(z)
 
     

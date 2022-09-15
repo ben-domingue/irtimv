@@ -142,11 +142,11 @@ mtext(side=1,line=1.75,at=nrow(z)+.3,"C",cex=.5)
 ##
 for (i in 1:length(L)) {
     z<-L[[i]]
-    lines(1:nrow(z),z$Rasch,type='b',col='black',lwd=2,pch=19,lty=i)
+    points(1:nrow(z),z$Rasch,col='black',pch=19)
     text(nrow(z),z$Rasch[nrow(z)],pos=4,'1PL',col='black',cex=.75)
-    lines(1:nrow(z),z$X2PL,type='b',col='red',lwd=2,pch=19,lty=i)
-    text(nrow(z),z$X2PL[nrow(z)],pos=4,'2PL',col='red',cex=.75)
-    lines(1:nrow(z),z$X3PL,type='b',col='blue',lwd=2,pch=19,lty=i)
+    points(1:nrow(z),z$X2PL,col='red',pch=19)
+    text(nrow(z),z$X2PL[nrow(z)],pos=1,'2PL',col='red',cex=.75)
+    points(1:nrow(z),z$X3PL,col='blue',pch=19)
     text(nrow(z),z$X3PL[nrow(z)],pos=4,'3PL',col='blue',cex=.75)
 }
 dev.off()

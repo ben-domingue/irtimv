@@ -72,8 +72,8 @@ tab<-do.call("rbind",tab)
 dump("tab","")
 
 library(xtable)
-print(xtable(tab[,-4],digits=2,
-             display=c("f","e","e","d","e"))
+print(xtable(tab[,-(4:5)],digits=2,
+             display=c("f","e","e","d"))
       )
 
 
