@@ -155,4 +155,9 @@ cor(abs(tab0[,3]-.5),tab0[,4])
 
 
 library(xtable)
-print(xtable(tab0,digits=2,display=c("f","d","d","f","e","e","e","e")))
+#print(xtable(tab0,digits=2,display=c("f","d","d","f","e","e","e","e")))
+print(xtable(tab0,
+             digits =c(0,0,0,2,4,4,4,4),
+             #display=c("f","d","d","f","e","e","e","e")
+             )
+             )
