@@ -26,13 +26,13 @@ parfun<-function(arg,numitems=50) {
             m<-mirt(resp[,-index],1,"Rasch")
         }
         if (mod=="2PL") {
-            s<-paste("F=1-",ni,"\nPRIOR = (1-",ni,", a1, lnorm, 0.2, 0.2)",
+            s<-paste("F=1-",ni,"\nPRIOR = (1-",ni,", a1, lnorm, 0.0, 1.0)",
                      sep="") 
             model<-mirt.model(s)
             test<-try(m<-mirt(resp[,-index],model,itemtype=rep("2PL",ni),method="EM",technical=list(NCYCLES=10000)))
         }
         if (mod=="3PL") {
-            s<-paste("F=1-",ni,"\nPRIOR = (1-",ni,", a1, lnorm, 0.2, 0.2),(1-",ni,", g, expbeta, 2, 17)",
+            s<-paste("F=1-",ni,"\nPRIOR = (1-",ni,", a1, lnorm, 0.0, 1.0),(1-",ni,", g, expbeta, 2, 17)",
                      sep="") 
             model<-mirt.model(s)
             test<-try(m<-mirt(resp[,-index],model,itemtype=rep(mod,ni),method="EM",technical=list(NCYCLES=10000)))
@@ -204,7 +204,7 @@ names<-list("RMSEA"="RMSEA", "AIC delta"="AIC difference", "Likelihood Ratio Tes
 metrics<-c("RMSEA","AIC delta",#"Likelihood Ratio Test",
            "IMV change")
 
-pdf("/home/bd/Dropbox/Apps/Overleaf/IMV_IRT/misfit_slope.pdf",width=6,height=2.5)
+pdf("~/Dropbox/Apps/Overleaf/IMV_IRT/misfit_slope.pdf",width=6,height=2.5)
 load("misfit_slope.Rdata")
 x<-tab.slope
 ##
@@ -239,7 +239,7 @@ for (d in diff) {
 }
 dev.off()
 
-pdf("/home/bd/Dropbox/Apps/Overleaf/IMV_IRT/misfit_guess.pdf",width=6,height=7)
+pdf("~/Dropbox/Apps/Overleaf/IMV_IRT/misfit_guess.pdf",width=6,height=7)
 load("misfit_guess.Rdata")
 x<-tab.guess
 x$value<-ifelse(x$metric=="Likelihood Ratio Test",-log10(x$value),x$value)

@@ -14,7 +14,7 @@ twopl.mod<-function (x, ability = "EAP")
     index <- grep("id", names(resp))
     ni <- ncol(resp) - 1
     s <- paste("F=1-", ni, "\n             PRIOR = (1-", ni, 
-        ", a1, lnorm, 0.2, 0.2)", sep = "")
+        ", a1, lnorm, 0.0, 0.0)", sep = "")
     model <- mirt.model(s)
     test <- try(m <- mirt(resp[, -index], model, itemtype = rep("2PL", 
         ni), method = "EM", technical = list(NCYCLES = 10000)))
@@ -58,7 +58,7 @@ parfun<-function(fn,ntimes=4,nmax=10000) {
         rm2<-M2(m2,impute=5)
     }
     ##
-    c(rm1$RMSEA[1],rm2$RMSEA[1],aic.del,lrt.pv)
+    c(rm1$RMSEA[1],rm2$RMSEA[1],-1*aic.del,lrt.pv) #to match what is in main text
 }
 
 library(parallel)

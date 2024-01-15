@@ -25,13 +25,13 @@ parfun<-function(arg,numitems=50,b.mean=0) {
             m<-mirt(resp[,-index],1,"Rasch")
         }
         if (mod=="2PL") {
-            s<-paste("F=1-",ni,"\nPRIOR = (1-",ni,", a1, lnorm, 0.2, 0.2)",
+            s<-paste("F=1-",ni,"\nPRIOR = (1-",ni,", a1, lnorm, 0.0, 1.0)",
                      sep="") 
             model<-mirt.model(s)
             test<-try(m<-mirt(resp[,-index],model,itemtype=rep("2PL",ni),method="EM",technical=list(NCYCLES=10000)))
         }
         if (mod=="3PL") {
-            s<-paste("F=1-",ni,"\nPRIOR = (1-",ni,", a1, lnorm, 0.2, 0.2),(1-",ni,", g, expbeta, 2, 17)",
+            s<-paste("F=1-",ni,"\nPRIOR = (1-",ni,", a1, lnorm, 0.0, 1.0),(1-",ni,", g, expbeta, 2, 17)",
                      sep="") 
             model<-mirt.model(s)
             test<-try(m<-mirt(resp[,-index],model,itemtype=rep(mod,ni),method="EM",technical=list(NCYCLES=10000)))
@@ -120,10 +120,11 @@ argvals<-list()
 for (i in 1:nrow(z)) argvals[[i]]<-list(z[i,2],z[i,3],z[i,4])
 
 library(parallel)
-tab1<-mclapply(argvals,parfun,mc.cores=25,numitems=25)
-tab2<-mclapply(argvals,parfun,mc.cores=25,numitems=50)
-tab3<-mclapply(argvals,parfun,mc.cores=25,numitems=200)
-tab<-list(tab1,tab2,tab3)
+tab0<-mclapply(argvals,parfun,mc.cores=10,numitems=10)
+tab1<-mclapply(argvals,parfun,mc.cores=10,numitems=25)
+tab2<-mclapply(argvals,parfun,mc.cores=10,numitems=50)
+tab3<-mclapply(argvals,parfun,mc.cores=10,numitems=200)
+tab<-list(tab0,tab1,tab2,tab3)
 
 save(tab,file="misfit.Rdata")
 
@@ -256,7 +257,7 @@ f2<-function(tab,nitem) {
     ##
     L<-split(z,z$n)
     z<-L[[1]] #just for configuring the plot
-    plot(NULL,xlim=c(1,nrow(z)+2.3),ylim=c(-.03,.035),xlab="",xaxt="n",ylab="IMV")
+    plot(NULL,xlim=c(1,nrow(z)+2.3),ylim=c(-.05,.06),xlab="",xaxt="n",ylab="IMV")
     for (i in seq(-.025,.025,by=.025)) abline(h=i,lwd=1,col='gray')
     axis(side=1,at=1:nrow(z),labels=rep("",nrow(z)))
     mtext(side=1,at=1:nrow(z),z$sd,line=.75,cex=.5)
@@ -286,17 +287,17 @@ f2<-function(tab,nitem) {
 
 
 
-pdf("/home/bd/Dropbox/Apps/Overleaf/IMV_IRT/misfitA2.pdf",width=7.5,height=2.5)
+pdf("~/Dropbox/Apps/Overleaf/IMV_IRT/misfitA2.pdf",width=7.5,height=2.5)
 load("misfit.Rdata")
-numitems<-c(25,50,200)
-par(mfrow=c(1,3),mgp=c(2,1,0),mar=c(3,3,1.3,.1),oma=rep(0,4),bty='n')
+numitems<-c(10,25,50,200)
+par(mfrow=c(1,4),mgp=c(2,1,0),mar=c(3,3,1.3,.1),oma=rep(0,4),bty='n')
 for (i in 1:length(tab)) f1(tab[[i]],nitem=numitems[i])
 dev.off()
 
-pdf("/home/bd/Dropbox/Apps/Overleaf/IMV_IRT/misfitB.pdf",width=7.5,height=2.5)
+pdf("~/Dropbox/Apps/Overleaf/IMV_IRT/misfitB.pdf",width=7.5,height=2.5)
 load("misfit.Rdata")
-numitems<-c(25,50,200)
-par(mfrow=c(1,3),mgp=c(2,1,0),mar=c(3,3,1.3,.1),oma=rep(0,4),bty='n')
+numitems<-c(10,25,50,200)
+par(mfrow=c(1,4),mgp=c(2,1,0),mar=c(3,3,1.3,.1),oma=rep(0,4),bty='n')
 for (i in 1:length(tab)) f2(tab[[i]],nitem=numitems[i])
 dev.off()
 

@@ -1,4 +1,4 @@
-#/home/bd/Dropbox/projects/irt_meta/data/carnegie
+#/home/bd/Dropbox/projects/irt_meta/data/state
 
 #################################################################################################
 ##dichotomous items
@@ -21,7 +21,6 @@ for (i in 1:length(lf)) {
 }
 
 
-#colorado
 list.files(pattern="*_2007_*")->lf
 for (i in 1:length(lf)) {
     lf[i]->fn

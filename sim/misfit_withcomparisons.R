@@ -25,13 +25,13 @@ parfun<-function(arg,numitems=50) {
             m<-mirt(resp[,-index],1,"Rasch")
         }
         if (mod=="2PL") {
-            s<-paste("F=1-",ni,"\nPRIOR = (1-",ni,", a1, lnorm, 0.2, 0.2)",
+            s<-paste("F=1-",ni,"\nPRIOR = (1-",ni,", a1, lnorm, 0.0, 0.0)",
                      sep="") 
             model<-mirt.model(s)
             test<-try(m<-mirt(resp[,-index],model,itemtype=rep("2PL",ni),method="EM",technical=list(NCYCLES=10000)))
         }
         if (mod=="3PL") {
-            s<-paste("F=1-",ni,"\nPRIOR = (1-",ni,", a1, lnorm, 0.2, 0.2),(1-",ni,", g, expbeta, 2, 17)",
+            s<-paste("F=1-",ni,"\nPRIOR = (1-",ni,", a1, lnorm, 0.0, 0.0),(1-",ni,", g, expbeta, 2, 17)",
                      sep="") 
             model<-mirt.model(s)
             test<-try(m<-mirt(resp[,-index],model,itemtype=rep(mod,ni),method="EM",technical=list(NCYCLES=10000)))

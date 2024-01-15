@@ -50,7 +50,7 @@ makeresponse<-function(x) {
 }
 
 
-rasch<-function(x,ability="EAP") {
+rasch<-function(x,ability="EAP",return.model=FALSE) {
     ##
     resp<-makeresponse(x[x$oos==0,])
     library(mirt)
@@ -70,18 +70,18 @@ rasch<-function(x,ability="EAP") {
     kk<-x$load*x$th+x$easy
     kk<-exp(kk)
     x$p<-kk/(1+kk)
-    x
+    if (!return.model) x else list(x,m)
 }
 
 
-twopl<-function(x,ability="EAP") { ###re beta prior on guessing param https://groups.google.com/g/mirt-package/c/8Usx53BoXyw
+twopl<-function(x,ability="EAP",return.model=FALSE) { ###re beta prior on guessing param https://groups.google.com/g/mirt-package/c/8Usx53BoXyw
     ##
     resp<-makeresponse(x[x$oos==0,])
     library(mirt)
     index<-grep("id",names(resp))
     ni<-ncol(resp)-1
     s<-paste("F=1-",ni,"
-             PRIOR = (1-",ni,", a1, lnorm, 0.2, 0.2)",sep="") #-1.5
+             PRIOR = (1-",ni,", a1, lnorm, 0.0, 1.0)",sep="")
     model<-mirt.model(s)
     test<-try(m<-mirt(resp[,-index],model,itemtype=rep("2PL",ni),method="EM",technical=list(NCYCLES=10000)))
     if (class(test)!="try-error") {
@@ -98,18 +98,18 @@ twopl<-function(x,ability="EAP") { ###re beta prior on guessing param https://gr
         kk<-x$load*x$th+x$easy
         kk<-exp(kk)
         x$p<-kk/(1+kk)
-        x
+        if (!return.model) x else list(x,m)
     } else NULL
 }
 
-threepl<-function(x,ability="EAP") { ###re beta prior on guessing param https://groups.google.com/g/mirt-package/c/8Usx53BoXyw
+threepl<-function(x,ability="EAP",return.model=FALSE) { ###re beta prior on guessing param https://groups.google.com/g/mirt-package/c/8Usx53BoXyw
     ##
     resp<-makeresponse(x[x$oos==0,])
     library(mirt)
     index<-grep("id",names(resp))
     ni<-ncol(resp)-1
     s<-paste("F=1-",ni,"
-     PRIOR = (1-",ni,", a1, lnorm, 0.2, 0.2),(1-",ni,", g, expbeta, 2, 17)",sep="") 
+     PRIOR = (1-",ni,", a1, lnorm, 0.0, 1.0),(1-",ni,", g, expbeta, 2, 17)",sep="") 
     model<-mirt.model(s)
     test<-try(m<-mirt(resp[,-index],model,itemtype=rep("3PL",ni),method="EM",technical=list(NCYCLES=10000)))
     if (class(test)!="try-error") {
@@ -126,22 +126,23 @@ threepl<-function(x,ability="EAP") { ###re beta prior on guessing param https://
         kk<-x$load*x$th+x$easy
         kk<-x$guess+(1-x$guess)/(1+exp(-1*kk))
         x$p<-kk #/(1+kk)
-        x
+        if (!return.model) x else list(x,m)
     } else NULL
 }
 
 
-twopl.2f<-function(x) { ###re beta prior on guessing param https://groups.google.com/g/mirt-package/c/8Usx53BoXyw
+twopl.2f<-function(x,return.model=FALSE) {
     ##
     resp<-makeresponse(x[x$oos==0,])
     library(mirt)
     index<-grep("id",names(resp))
     ni<-ncol(resp)-1
-    s<-paste("F1=1-",ni,",
-F2=1-",ni,"
-            PRIOR = (1-",ni,", a1, lnorm, 0.2, 0.2),(1-",ni,", a2, lnorm, 0.2, 0.2)",sep="") #-1.5
+    s <- paste("F1=1-", ni, ",\nF2=1-", ni,
+               "\nCOV=F1*F2",
+               "\nPRIOR = (1-", ni, ", a1, lnorm, 0.0, 1.0),(1-", ni, ", a2, lnorm, 0.0, 1.0)", 
+               sep = "")
     model<-mirt.model(s)
-    test<-try(m<-mirt(resp[,-index],model,itemtype=rep("2PL",ni),method="EM",technical=list(NCYCLES=10000)))
+    test<-tryCatch(m<-mirt(resp[,-index],model,itemtype=rep("2PL",ni),method="EM",technical=list(NCYCLES=10000)))
     if (class(test)!="try-error") {
         co<-coef(m)
         co<-do.call("rbind",co[-length(co)])
@@ -156,7 +157,7 @@ F2=1-",ni,"
         kk<-x$load1*x$th1+x$load2*x$th2+x$easy
         kk<-exp(kk)
         x$p<-kk/(1+kk)
-        x
+        if (!return.model) x else list(x,m)
     } else NULL
 }
 

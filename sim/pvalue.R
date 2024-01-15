@@ -25,13 +25,13 @@ parfun<-function(arg,numitems=50,b.mean=0) {
             m<-mirt(resp[,-index],1,"Rasch")
         }
         if (mod=="2PL") {
-            s<-paste("F=1-",ni,"\nPRIOR = (1-",ni,", a1, lnorm, 0.2, 0.2)",
+            s<-paste("F=1-",ni,"\nPRIOR = (1-",ni,", a1, lnorm, 0.0, 1.0)",
                      sep="") 
             model<-mirt.model(s)
             test<-try(m<-mirt(resp[,-index],model,itemtype=rep("2PL",ni),method="EM",technical=list(NCYCLES=10000)))
         }
         if (mod=="3PL") {
-            s<-paste("F=1-",ni,"\nPRIOR = (1-",ni,", a1, lnorm, 0.2, 0.2),(1-",ni,", g, expbeta, 2, 17)",
+            s<-paste("F=1-",ni,"\nPRIOR = (1-",ni,", a1, lnorm, 0.0, 1.0),(1-",ni,", g, expbeta, 2, 17)",
                      sep="") 
             model<-mirt.model(s)
             test<-try(m<-mirt(resp[,-index],model,itemtype=rep(mod,ni),method="EM",technical=list(NCYCLES=10000)))
@@ -119,10 +119,11 @@ for (i in 1:length(bm)) {
     out[[i]]<-parfun(list(1000,0,0),b.mean=bm[i])
 }
 x<-data.frame(do.call("rbind",out))
-save(x,file="/home/bd/Dropbox/projects/irt_meta/output/pvalue.Rdata")
+save(x,file="~/Dropbox/projects/irt_meta/src/output/pvalue.Rdata")
 
-pdf("/home/bd/Dropbox/Apps/Overleaf/IMV_IRT/pvalue.pdf",width=4,height=3)
-load("/home/bd/Dropbox/projects/irt_meta/output/pvalue.Rdata")
+pdf("~/Dropbox/Apps/Overleaf/IMV_IRT/pvalue.pdf",width=4,height=3)
+load("~/Dropbox/projects/irt_meta/src/output/pvalue.Rdata")
+bm<-x$b.mean
 par(mgp=c(2,1,0),mar=c(3,3,1,1))
 plot(NULL,xlim=c(0,1.5),ylim=c(0,.55),xlab="E(b)",ylab="IMV")
 abline(h=0,col='gray')

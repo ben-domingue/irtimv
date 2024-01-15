@@ -25,13 +25,13 @@ parfun<-function(arg,numitems=50,b.mean=0) {
             m<-mirt(resp[,-index],1,"Rasch")
         }
         if (mod=="2PL") {
-            s<-paste("F=1-",ni,"\nPRIOR = (1-",ni,", a1, lnorm, 0.2, 0.2)",
+            s<-paste("F=1-",ni,"\nPRIOR = (1-",ni,", a1, lnorm, 0.0, 1.0)",
                      sep="") 
             model<-mirt.model(s)
             test<-try(m<-mirt(resp[,-index],model,itemtype=rep("2PL",ni),method="EM",technical=list(NCYCLES=10000)))
         }
         if (mod=="3PL") {
-            s<-paste("F=1-",ni,"\nPRIOR = (1-",ni,", a1, lnorm, 0.2, 0.2),(1-",ni,", g, expbeta, 2, 17)",
+            s<-paste("F=1-",ni,"\nPRIOR = (1-",ni,", a1, lnorm, 0.0, 1.0),(1-",ni,", g, expbeta, 2, 17)",
                      sep="") 
             model<-mirt.model(s)
             test<-try(m<-mirt(resp[,-index],model,itemtype=rep(mod,ni),method="EM",technical=list(NCYCLES=10000)))
@@ -131,17 +131,18 @@ argvals<-list()
 for (i in 1:nrow(z)) argvals[[i]]<-list(z[i,2],z[i,3],z[i,4])
 
 library(parallel)
+tab0<-mclapply(argvals,parfun,mc.cores=25,numitems=10)
 tab1<-mclapply(argvals,parfun,mc.cores=25,numitems=25)
 tab2<-mclapply(argvals,parfun,mc.cores=25,numitems=50)
 tab3<-mclapply(argvals,parfun,mc.cores=25,numitems=200)
-tab<-list(tab1,tab2,tab3)
+tab<-list(tab0,tab1,tab2,tab3)
 
-save(tab,file="/home/users/bdomingu/irt_meta/misfit_bysumscore.Rdata")
+save(tab,file="~misfit_bysumscore.Rdata")
 
 
-pdf("/home/bd/Dropbox/Apps/Overleaf/IMV_IRT/guess_sumscore.pdf",width=6,height=7)
+pdf("~/Dropbox/Apps/Overleaf/IMV_IRT/guess_sumscore.pdf",width=8,height=6)
 load("misfit_bysumscore.Rdata")
-par(mfcol=c(3,3),mgp=c(2,1,0),mar=c(3,3,1.3,.1),oma=c(0.2,0.2,1.2,0.2),bty='n')
+par(mfcol=c(3,4),mgp=c(2,1,0),mar=c(3,3,1.3,.1),oma=c(0.2,0.2,1.2,0.2),bty='n')
 pf<-function(tab,ni) {
     tab<-tab[tab$nss>10,]
     ##
@@ -157,7 +158,7 @@ pf<-function(tab,ni) {
     gm<-unique(tab$gm)
     legend("topright",bty='n', legend=bquote(C~"="~.(gm)))
 }
-ni<-c(25,50,200)
+ni<-c(10,25,50,200)
 for (i in 1:length(tab)) {
     z<-tab[[i]]
     z<-data.frame(do.call("rbind",z))

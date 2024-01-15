@@ -25,13 +25,13 @@ parfun<-function(arg,numitems=50,b.mean=0) {
             m<-mirt(resp[,-index],1,"Rasch")
         }
         if (mod=="2PL") {
-            s<-paste("F=1-",ni,"\nPRIOR = (1-",ni,", a1, lnorm, 0.2, 0.2)",
+            s<-paste("F=1-",ni,"\nPRIOR = (1-",ni,", a1, lnorm, 0.0, 1.0)",
                      sep="") 
             model<-mirt.model(s)
             test<-try(m<-mirt(resp[,-index],model,itemtype=rep("2PL",ni),method="EM",technical=list(NCYCLES=10000)))
         }
         if (mod=="3PL") {
-            s<-paste("F=1-",ni,"\nPRIOR = (1-",ni,", a1, lnorm, 0.2, 0.2),(1-",ni,", g, expbeta, 2, 17)",
+            s<-paste("F=1-",ni,"\nPRIOR = (1-",ni,", a1, lnorm, 0.0, 1.0),(1-",ni,", g, expbeta, 2, 17)",
                      sep="") 
             model<-mirt.model(s)
             test<-try(m<-mirt(resp[,-index],model,itemtype=rep(mod,ni),method="EM",technical=list(NCYCLES=10000)))
@@ -119,7 +119,7 @@ save(tab2,file="theta.Rdata")
 
 #######################################
 
-pdf("/home/bd/Dropbox/Apps/Overleaf/IMV_IRT/theta.pdf",width=3.5,height=3)
+pdf("~/Dropbox/Apps/Overleaf/IMV_IRT/theta.pdf",width=3.5,height=3)
 par(mgp=c(2,1,0),mar=c(3,3,1,1))
 load("theta.Rdata")
 x<-do.call("rbind",tab2)
