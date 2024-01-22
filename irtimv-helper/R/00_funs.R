@@ -142,7 +142,7 @@ twopl.2f<-function(x,return.model=FALSE) {
                "\nPRIOR = (1-", ni, ", a1, lnorm, 0.0, 1.0),(1-", ni, ", a2, lnorm, 0.0, 1.0)", 
                sep = "")
     model<-mirt.model(s)
-    test<-tryCatch(m<-mirt(resp[,-index],model,itemtype=rep("2PL",ni),method="EM",technical=list(NCYCLES=10000)))
+    test<-tryCatch(m<-mirt(resp[,-index],model,itemtype=rep("2PL",ni),method="EM",technical=list(NCYCLES=2000)))
     if (class(test)!="try-error") {
         co<-coef(m)
         co<-do.call("rbind",co[-length(co)])

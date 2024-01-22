@@ -56,11 +56,8 @@ source("/home/users/bdomingu/imv_irw/filelist.R")
 #tab<-mclapply(lf,parfun,mc.cores=20,mc.set.seed=8160310,nmax=25000)
 #save(tab,file="/scratch/users/bdomingu/imv_irt/mirt.Rdata")
 
-#exclude<-c("eurpar2_mudfold.Rdata","state_c3_2007_7_responses.Rdata")
-#lf<-lf[!(lf %in% exclude)]
-
 tab<-list()
-for (i in 67:89) {#for (i in 1:length(lf)) {
+for (i in 1:length(lf)) {
     print(lf[i])
     tab[[i]]<-parfun(lf[i],nmax=25000)
                                         #save(tab,file="/scratch/users/bdomingu/imv_irt/mirt.Rdata")

@@ -1,4 +1,4 @@
-sim<-function(mu=0,N=1000,ni=50,sl.sd=0.3,gg=0,uu=1,xi.sd=0) {
+sim0<-function(N=1000,ni=50,sl.sd=0.3,gg=0,uu=1,xi.sd=0) {
     irf<-function(th,
                   a=1,
                   b,
@@ -13,7 +13,7 @@ sim<-function(mu=0,N=1000,ni=50,sl.sd=0.3,gg=0,uu=1,xi.sd=0) {
         p
     }
     th<-rnorm(N)
-    b<-rnorm(ni,mean=mu)
+    b<-rnorm(ni,mean=0)
     a<-exp(rnorm(ni,sd=sl.sd))
     g<-runif(ni,min=0,gg)
     u<-runif(ni,min=uu,max=1)
@@ -29,7 +29,7 @@ sim<-function(mu=0,N=1000,ni=50,sl.sd=0.3,gg=0,uu=1,xi.sd=0) {
     x<-data.frame(do.call("rbind",x))
     ##
     x$oos<-0
-    x2<-x[sample(1:nrow(x),25000),]
+    x2<-x
     x2$resp<-rbinom(nrow(x2),1,x2$p)
     x2$oos<-1
     x<-data.frame(rbind(x,x2))
@@ -65,65 +65,66 @@ sim<-function(mu=0,N=1000,ni=50,sl.sd=0.3,gg=0,uu=1,xi.sd=0) {
         f2<-m@Fit[c("AIC",  "BIC", "SABIC", "HQ","logLik")] ##hi! aic is first here, ok below
         c(f2,rmsea=f1$RMSEA)
     }
-    out<-list(c(om.r2=om.r2,om.23=om.23,rmse.r=rmse.r,rmse.2=rmse.2,rmse.3=rmse.3),rasch=fit(mr),two=fit(m2),three=fit(m3))
-    c(mu=mu,prev=mean(x$resp),unlist(out))
+    out<-list(c(N=N,ni=ni,om.r2=om.r2,om.23=om.23,rmse.r=rmse.r,rmse.2=rmse.2,rmse.3=rmse.3),rasch=fit(mr),two=fit(m2),three=fit(m3))
+    c(prev=mean(x$resp),unlist(out))
 }
 
-mu<-runif(250,min=-3,max=3)
+sim<-function(n,type) if (type=='np') sim0(N=n) else sim0(ni=n)
 
 library(parallel)
-L1<-mclapply(mu,sim,mc.cores=10,N=1000)
-#L2<-mclapply(mu,sim,mc.cores=10,N=5000,gg=.2,uu=.8,xi.sd=.3)
+n<-runif(2500,min=10,max=50)
+L1<-mclapply(n,sim,mc.cores=15,type='ni')
 
-L<-list(L1) #,L2)
-save(L,file='altmetric.Rdata')
 
-load("altmetric.Rdata")
+n<-runif(2500,min=100,max=1000)
+L2<-mclapply(n,sim,mc.cores=15,type='np')
+
+L<-list(L1,L2)
+save(L,file='altmetric_Ns.Rdata')
+
+pdf("~/Dropbox/Apps/Overleaf/IMV_IRT/altmetric_Ns.pdf",width=7.5,height=4)
+load("altmetric_Ns.Rdata")
+par(mfrow=c(2,4),mgp=c(2,1,0),mar=c(3,3,1,1),oma=rep(.5,4))
 pf<-function(x,y,...) {
     m<-loess(y~x)
     lines(m$x,fitted(m),lwd=2,...)
 }
-
-pdf("~/Dropbox/Apps/Overleaf/IMV_IRT/altmetric.pdf",width=7.5,height=2.5)
-par(mfrow=c(1,4),mgp=c(2,1,0),mar=c(3,3,2,1),oma=rep(.5,4))
-pf2<-function(L,...) {
-    z<-sapply(L,function(x) x[1])
-    z<-as.numeric(z)
-    L<-L[!is.na(z)]
-    ##
-    x<-data.frame(do.call("rbind",L))
-    x[order(x$mu),]->x
+pf2<-function(x,...,leg=TRUE) {
     xl<-range(x$mu)
-    plot(NULL,xlim=xl,ylim=c(.04,.08),ylab='rmse',xlab=expression(mu))
-    legend("topright",bty='n',fill=c("black","blue","red"),c("1PL","2PL","3PL"))
-    #mtext(side=3,line=0.3,...)
+    plot(NULL,xlim=xl,ylim=c(.06,.12),ylab='RMSE',...)
+    if (leg) legend("topright",bty='n',fill=c("black","blue","red"),c("1PL","2PL","3PL"))
     pf(x$mu,x$rmse.r)
     pf(x$mu,x$rmse.2,col='blue')
     pf(x$mu,x$rmse.3,col='red')
     ##
-    plot(NULL,xlim=xl,ylim=c(-.005,.01),ylab='imv',xlab=expression(mu)); abline(h=0,lty=2,col='gray')
+    plot(NULL,xlim=xl,ylim=c(-.0015,.0055),ylab='IMV',...); abline(h=0,lty=2,col='gray')
     pf(x$mu,x$om.r2,col='blue')
     pf(x$mu,x$om.23,col='red')
-    legend("topright",bty='n',fill=c("blue","red"),c("(1PL,2PL)","(2PL,3PL)"))
+    if (leg) legend("right",bty='n',fill=c("blue","red"),c("(1PL,2PL)","(2PL,3PL)"))
     ##
-    plot(NULL,xlim=xl,ylim=c(0,.03),ylab='rmsea',xlab=expression(mu)); abline(h=0,lty=2,col='gray')
+    plot(NULL,xlim=xl,ylim=c(0,.035),ylab='RMSEA',...); abline(h=0,lty=2,col='gray')
     pf(x$mu,x$rasch.rmsea)
     pf(x$mu,x$two.rmsea,col='blue')
     pf(x$mu,x$three.rmsea,col='red')
-    legend("topright",bty='n',fill=c("black","blue","red"),c("1PL","2PL","3PL"))
+    if (leg) legend("topright",bty='n',fill=c("black","blue","red"),c("1PL","2PL","3PL"))
     ##
-    y<-c(x$rasch.AIC-x$two.AIC,x$two.AIC-x$three.AIC)
-    ran<-range(y)
-    plot(NULL,xlim=xl,ylim=ran,ylab='delta(aic)',xlab=expression(mu)); abline(h=0,lty=2,col='gray')
+    #y<-c(x$rasch.AIC-x$two.AIC,x$two.AIC-x$three.AIC)
+    #ran<-range(y)
+    plot(NULL,xlim=xl,ylim=c(-200,450),ylab='Change in AIC',...); abline(h=0,lty=2,col='gray')
     y<-x$rasch.AIC-x$two.AIC
     pf(x$mu,y,col='blue')
     y<-x$two.AIC-x$three.AIC
     pf(x$mu,y,col='red')
-    legend("topright",bty='n',fill=c("blue","red"),c("1PL-2PL","2PL-3PL"))
+    if (leg) legend("right",bty='n',fill=c("blue","red"),c("1PL-2PL","2PL-3PL"))
 }
-pf2(L[[1]],'1PL')
-#pf2(L[[2]],'Asymmetric 3PL')
+##
+x<-data.frame(do.call("rbind",L[[1]]))
+x$mu<-x$ni
+x[order(x$mu),]->x
+pf2(x,xlab="N items")
+##
+x<-data.frame(do.call("rbind",L[[2]]))
+x$mu<-x$N
+x[order(x$mu),]->x
+pf2(x,xlab="N people",leg=FALSE)
 dev.off()
-
-
-

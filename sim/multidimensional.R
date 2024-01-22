@@ -1,15 +1,20 @@
-
-simdat<-function(r,
-                 tau,
-                 np=5000,ni=50,
-                 check.itemestimates=FALSE
-                 ) {
+simdat<-function(vars) {
+    for (i in 1:length(vars)) assign(names(vars)[i],vars[[i]])
+    if (!exists("np")) np<-5000
+    if (!exists("ni")) ni<-50
+    if (!exists("load.mean")) load.mean<-0
+    if (!exists("load.cov")) load.cov<-0
+    if (!exists("load.var")) load.var<-1
+    ##
     library(MASS)
     th<-mvrnorm(np,c(0,0),matrix(c(1,r,r,1),2,2))
     b<-rnorm(ni)
-    a<-rnorm(ni*2,sd=.3)
+    #a<-rnorm(ni*2,sd=.3)
+    #a<-exp(a)
+    #a<-matrix(a,ncol=2,nrow=ni,byrow=FALSE)
+    ##
+    a<-mvrnorm(ni,rep(load.mean,2),matrix(c(load.var,load.cov,load.cov,load.var),2,2))
     a<-exp(a)
-    a<-matrix(a,ncol=2,nrow=ni,byrow=FALSE)
     ##tau
     if (tau>0) {
         index<-sample(1:ni,ni*tau)
@@ -18,8 +23,6 @@ simdat<-function(r,
             a[i,colum]<-0
         }
     }
-                                        #mm<-quantile(a[,1],tau)
-                                        #a[,2]<-ifelse(a[,1]>mm,0,a[,2])
     ##
     p<-th %*% t(a)
     for (i in 1:length(b)) p[,i]<-p[,i]+b[i]
@@ -72,58 +75,74 @@ proc<-function(x) {
     c(om=om,b=b.cor,a1=a1.cor,a2=a2.cor,twopl.err=twopl.err,twopl.2f.err=twopl.2f.err,mad=mad)
 }
 
-f<-function(r,tau,np=10000) {
-    x<-simdat(r,tau,np=np)
+f<-function(vars) {
+    x<-simdat(vars)
     z<-proc(x)
-    c(r=r,tau=tau,z)
+    c(unlist(vars),z)
 }
+
 
 r<-sort(runif(200))
-library(parallel)
-L<-list()
-taus<-seq(0,1,by=.5)
-for (tau in taus) {
-    tmp<-mclapply(r,f,tau=tau,mc.cores=25)
-    L[[as.character(tau)]]<-do.call("rbind",tmp)
+taus<-c(0,0.5,1)
+load.var<-1 #c(0.5,1)
+z<-expand.grid(r=r,tau=taus,load.var=load.var)
+argvals<-list()
+for (i in 1:nrow(z)) {
+    tmp<-list(z[i,1],z[i,2],z[i,3])
+    names(tmp)<-names(z)
+    argvals[[i]]<-tmp
 }
 
+
+library(parallel)
+L<-mclapply(argvals,f,mc.cores=50)
+
 save(L,file="multidimensional.Rdata")
+
 
 ###############
 
 pdf("~/Dropbox/Apps/Overleaf/IMV_IRT/md.pdf",width=7,height=3)
 
 load("multidimensional.Rdata")
-cm<-sapply(L,colMeans)
-layout(matrix(c(1,1,2),nrow=1,byrow=TRUE))
+z<-data.frame(do.call("rbind",L))
+L2<-split(z,z$load.var)
+
+##
 par(mgp=c(2,1,0),mar=c(3,3,1,1))
-cols<-colorRampPalette(c("blue", "red"))( length(L) ) ## (n)
-##
-plot(NULL,xlim=c(-.07,1),xaxt='n',ylim=c(-.005,.05),xlab=expression(rho),ylab="IMV(2PL,2F-2PL)")
-axis(side=1,at=seq(0,1,by=.25))
-abline(h=0)
-for (i in 1:length(L)) {
-    z<-L[[i]]
-    z<-cbind(z[,1],z[,3])
-    m<-loess(z[,2]~z[,1])
-    lines(m$x,fitted(m),col=cols[i],lwd=2)
-    text(m$x[1],fitted(m)[1],pos=2,cm[2,i],col=cols[i])
-}
-legend("topright",bty='n',title=expression(tau),fill=cols,legend=cm[2,])
-##
-plot(NULL,xlim=c(0,1),xaxt='n',xlab=expression(rho),ylab='RMSE',ylim=c(-.005,.15))
-axis(side=1,at=seq(0,1,by=.25))
-abline(h=0)
-for (ii in 7:8) {
+layout(matrix(c(1,1,2),nrow=1,ncol=3,byrow=TRUE))
+for (iii in 1:length(L2)) {
+    L<-L2[[iii]]
+    L<-split(L,L$tau)
+    cm<-sapply(L,colMeans)
+    cols<-colorRampPalette(c("blue", "red"))( length(L) ) ## (n)
+    ##
+    plot(NULL,xlim=c(-.07,1),xaxt='n',ylim=c(-.005,.06),xlab=expression(rho),ylab="IMV(2PL,2F-2PL)")
+    axis(side=1,at=seq(0,1,by=.25))
+    abline(h=0)
     for (i in 1:length(L)) {
         z<-L[[i]]
-        z<-cbind(z[,1],z[,ii])
+        z<-cbind(z$r,z$om)
         m<-loess(z[,2]~z[,1])
-        lines(m$x,fitted(m),col=cols[i],lwd=2,lty=ii-6)
-        #text(m$x[1],fitted(m)[1],pos=2,cm[2,i],col=cols[i])
+        lines(m$x,fitted(m),col=cols[i],lwd=2)
+        text(m$x[1],fitted(m)[1],pos=2,cm[2,i],col=cols[i])
     }
+    legend("topright",bty='n',title=expression(tau),fill=cols,legend=cm[2,])
+    ##
+    plot(NULL,xlim=c(0,1),xaxt='n',xlab=expression(rho),ylab='RMSE',ylim=c(-.005,.17))
+    axis(side=1,at=seq(0,1,by=.25))
+    abline(h=0)
+    for (nm in c('twopl.err','twopl.2f.err')) {
+        for (i in 1:length(L)) {
+            z<-L[[i]]
+            z<-cbind(z$r,z[,nm])
+            m<-loess(z[,2]~z[,1])
+            lines(m$x,fitted(m),col=cols[i],lwd=2,lty=ifelse(nm=='twopl.err',2,1))
+                                        #text(m$x[1],fitted(m)[1],pos=2,cm[2,i],col=cols[i])
+        }
+    }
+    legend('topright',bty='n',title='RMSE',legend=c("2PL","2F-2PL"),lty=c(1,2),lwd=2)
 }
-legend('topright',bty='n',title='RMSE',legend=c("2PL","2F-2PL"),lty=c(1,2),lwd=2)
 
 dev.off()
 
