@@ -40,7 +40,7 @@ ran<-range(tab00)
 
 #plot(log10(tab0$people),tab0$items,xlab="Log10(N respondents)",ylab="N items",pch=19,col='blue')
 
-pdf("~/Dropbox/Apps/Overleaf/IMV_IRT/empiricalresults.pdf",width=6,height=3)
+pdf("~/Dropbox/Apps/Overleaf/IMV_IRT/empiricalresults.pdf",width=7,height=2.3)
 par(mfrow=c(1,2),mgp=c(2,1,0),mar=c(3,3,1,1))
 ##
 xl<-range(tab0$rasch)
@@ -63,7 +63,7 @@ c3<-rgb(1,0,1,alpha=.25)
 points(tab0$mirt,1+jit,pch=19,
        col=c3,
 )
-mtext(side=2,at=1:3,line=.5,las=2,c("IMV(1PL,2PL)","IMV(2PL,3PL)","IMV(2PL,2F-2PL)"),cex=.7)
+mtext(side=2,at=3:1,line=.5,las=2,c("IMV(1PL,2PL)","IMV(2PL,3PL)","IMV(2PL,2F-2PL)"),cex=.7)
 zz<-tab0[,c("twopl","threepl","mirt")]
 legend(.03,2.5,bty='n',legend=format(colMeans(zz,na.rm=TRUE),sci=TRUE),fill=c(c1,c2,c3),title="Average",cex=.7)
 dev.off()

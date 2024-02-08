@@ -119,7 +119,7 @@ save(tab2,file="theta.Rdata")
 
 #######################################
 
-pdf("~/Dropbox/Apps/Overleaf/IMV_IRT/theta.pdf",width=3.5,height=3)
+pdf("~/Dropbox/Apps/Overleaf/IMV_IRT/theta.pdf",width=4,height=3)
 par(mgp=c(2,1,0),mar=c(3,3,1,1))
 load("theta.Rdata")
 x<-do.call("rbind",tab2)
@@ -135,17 +135,17 @@ plot(NULL,xlim=c(1,nrow(z)+.7),ylim=c(0,.003),xlab="",xaxt="n",ylab="IMV(ML,EAP)
                                         #for (i in seq(-.01,.025,by=.005)) abline(h=i,lwd=1,col='gray')
 abline(h=0,col='gray')
 axis(side=1,at=1:nrow(z),labels=rep("",nrow(z)))
-mtext(side=1,at=1:nrow(z),z$sd,line=.75,cex=.5)
-mtext(side=1,line=.75,at=nrow(z)+.3,expression(sigma),cex=.5)
-mtext(side=1,at=1:nrow(z),z$gm,line=1.75,cex=.5)
-mtext(side=1,line=1.75,at=nrow(z)+.3,"C",cex=.5)
+mtext(side=1,at=1:nrow(z),z$sd,line=.75,cex=.75)
+mtext(side=1,line=.75,at=nrow(z)+.43,expression(sigma),cex=.75)
+mtext(side=1,at=1:nrow(z),z$gm,line=1.75,cex=.75)
+mtext(side=1,line=1.75,at=nrow(z)+.43,"C",cex=.75)
 ##
 for (i in 1:length(L)) {
     z<-L[[i]]
     points(1:nrow(z),z$Rasch,col='black',pch=19)
     text(nrow(z),z$Rasch[nrow(z)],pos=4,'1PL',col='black',cex=.75)
     points(1:nrow(z),z$X2PL,col='red',pch=19)
-    text(nrow(z),z$X2PL[nrow(z)],pos=1,'2PL',col='red',cex=.75)
+    text(nrow(z),z$X2PL[nrow(z)],pos=2,'2PL',col='red',cex=.75)
     points(1:nrow(z),z$X3PL,col='blue',pch=19)
     text(nrow(z),z$X3PL[nrow(z)],pos=4,'3PL',col='blue',cex=.75)
 }

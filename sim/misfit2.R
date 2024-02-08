@@ -166,12 +166,12 @@ f1<-function(tab,nitem) {
     ##
     points(1:nrow(z),z$om2,col='blue',pch=19)
     points(1:nrow(z),z$om3,col='red',pch=19)
-    points(1:nrow(z),z$om3a,col='green',pch=19)
+    points(1:nrow(z),z$om3a,col='black',pch=19)
                                         #text(nrow(z),z$om2[nrow(z)],pos=4,paste("IMV(1,2),N=",substr(names(L)[i],1,1),"K",sep=""),col='blue',cex=.75)
                                         #text(nrow(z),z$om3[nrow(z)],pos=4,paste("IMV(2,3),N=",substr(names(L)[i],1,1),"K",sep=""),col='red',cex=.75)
     text(nrow(z),z$om2[nrow(z)],pos=4,paste("IMV(1,2)",sep=""),col='blue',cex=.75)
     text(nrow(z),z$om3[nrow(z)],pos=4,paste("IMV(2,3)",sep=""),col='red',cex=.75)
-    text(nrow(z),z$om3a[nrow(z)],pos=3,paste("IMV(1,3)",sep=""),col='green',cex=.75)
+    text(nrow(z),z$om3a[nrow(z)],pos=3,paste("IMV(1,3)",sep=""),col='black',cex=.75)
     #z2<-z[z$gm==.3,]
     #print(z2)
     #print(summary(z2$om2/z2$om3))
