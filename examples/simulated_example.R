@@ -1,4 +1,3 @@
-
 ##comparison of 2pl and 1pl fits when 1pl is dgp
 ##simulate data
 set.seed(170301)

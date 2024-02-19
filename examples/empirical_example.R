@@ -1,7 +1,8 @@
 ##example analysis of one dataset
+set.seed(170301)
 library(mirt); library(redivis); library(irw)
 dataset <- redivis::user("stanford_templates")$
-    dataset("item_response_warehouse")
+    dataset("item_response_warehouse",version='v2.0')
 df <- dataset$table("content_literacy_intervention")$to_data_frame()
 df$item<-paste("item_",df$item,sep='')
 ##cross-validation for models estimated in mirt
