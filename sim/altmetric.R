@@ -78,13 +78,12 @@ L1<-mclapply(mu,sim,mc.cores=10,N=1000)
 L<-list(L1) #,L2)
 save(L,file='altmetric.Rdata')
 
+pdf("~/Dropbox/Apps/Overleaf/IMV_IRT/altmetric.pdf",width=7.5,height=2.5)
 load("altmetric.Rdata")
 pf<-function(x,y,...) {
     m<-loess(y~x)
     lines(m$x,fitted(m),lwd=2,...)
 }
-
-pdf("~/Dropbox/Apps/Overleaf/IMV_IRT/altmetric.pdf",width=7.5,height=2.5)
 par(mfrow=c(1,4),mgp=c(2,1,0),mar=c(3,3,2,1),oma=rep(.5,4))
 pf2<-function(L,...) {
     z<-sapply(L,function(x) x[1])
@@ -94,27 +93,28 @@ pf2<-function(L,...) {
     x<-data.frame(do.call("rbind",L))
     x[order(x$mu),]->x
     xl<-range(x$mu)
-    plot(NULL,xlim=xl,ylim=c(.04,.08),ylab='rmse',xlab=expression(mu))
-    legend("topright",bty='n',fill=c("black","blue","red"),c("1PL","2PL","3PL"))
-    #mtext(side=3,line=0.3,...)
-    pf(x$mu,x$rmse.r)
-    pf(x$mu,x$rmse.2,col='blue')
-    pf(x$mu,x$rmse.3,col='red')
+    plot(NULL,xlim=xl,ylim=c(-.005,.08),ylab='Change in RMSE',xlab=expression(mu)); abline(h=0,lty=2,col='gray')
+    #legend("topright",bty='n',col=c("black","blue","red"),c("1PL","2PL","3PL"),lty=2)
+    legend("left",bty='n',fill=c("blue","red"),c("1PL-2PL","2PL-3PL"))
+    pf(x$mu,x$rmse.r,lty=2)
+    pf(x$mu,x$rmse.2,col='blue',lty=2)
+    pf(x$mu,x$rmse.3,col='red',lty=2)
+    pf(x$mu,x$rmse.r-x$rmse.2,col='blue')
+    pf(x$mu,x$rmse.2-x$rmse.3,col='red')
     ##
-    plot(NULL,xlim=xl,ylim=c(-.005,.01),ylab='imv',xlab=expression(mu)); abline(h=0,lty=2,col='gray')
+    plot(NULL,xlim=xl,ylim=c(-.005,.01),ylab='IMV',xlab=expression(mu)); abline(h=0,lty=2,col='gray')
     pf(x$mu,x$om.r2,col='blue')
     pf(x$mu,x$om.23,col='red')
     legend("topright",bty='n',fill=c("blue","red"),c("(1PL,2PL)","(2PL,3PL)"))
     ##
-    plot(NULL,xlim=xl,ylim=c(0,.03),ylab='rmsea',xlab=expression(mu)); abline(h=0,lty=2,col='gray')
-    pf(x$mu,x$rasch.rmsea)
-    pf(x$mu,x$two.rmsea,col='blue')
-    pf(x$mu,x$three.rmsea,col='red')
-    legend("topright",bty='n',fill=c("black","blue","red"),c("1PL","2PL","3PL"))
+    plot(NULL,xlim=xl,ylim=c(0,.02),ylab='Change in RMSEA',xlab=expression(mu)); abline(h=0,lty=2,col='gray')
+    pf(x$mu,x$rasch.rmsea-x$two.rmsea,col='blue')
+    pf(x$mu,x$two.rmsea-x$three.rmsea,col='red')
+    legend("topright",bty='n',fill=c("blue","red"),c("1PL-2PL","2PL-3PL"))
     ##
     y<-c(x$rasch.AIC-x$two.AIC,x$two.AIC-x$three.AIC)
     ran<-range(y)
-    plot(NULL,xlim=xl,ylim=ran,ylab='delta(aic)',xlab=expression(mu)); abline(h=0,lty=2,col='gray')
+    plot(NULL,xlim=xl,ylim=ran,ylab='Change in AIC',xlab=expression(mu)); abline(h=0,lty=2,col='gray')
     y<-x$rasch.AIC-x$two.AIC
     pf(x$mu,y,col='blue')
     y<-x$two.AIC-x$three.AIC
