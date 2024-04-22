@@ -93,7 +93,7 @@ pf2<-function(L,...) {
     x<-data.frame(do.call("rbind",L))
     x[order(x$mu),]->x
     xl<-range(x$mu)
-    plot(NULL,xlim=xl,ylim=c(-.005,.08),ylab='Change in RMSE',xlab=expression(mu)); abline(h=0,lty=2,col='gray')
+    plot(NULL,xlim=xl,ylim=c(-.005,.08),ylab='Change in RMSE',xlab=expression(mu)); abline(h=0,lty=1,col='gray')
     #legend("topright",bty='n',col=c("black","blue","red"),c("1PL","2PL","3PL"),lty=2)
     legend("left",bty='n',fill=c("blue","red"),c("1PL-2PL","2PL-3PL"))
     pf(x$mu,x$rmse.r,lty=2)
@@ -102,19 +102,19 @@ pf2<-function(L,...) {
     pf(x$mu,x$rmse.r-x$rmse.2,col='blue')
     pf(x$mu,x$rmse.2-x$rmse.3,col='red')
     ##
-    plot(NULL,xlim=xl,ylim=c(-.005,.01),ylab='IMV',xlab=expression(mu)); abline(h=0,lty=2,col='gray')
+    plot(NULL,xlim=xl,ylim=c(-.005,.01),ylab='IMV',xlab=expression(mu)); abline(h=0,lty=1,col='gray')
     pf(x$mu,x$om.r2,col='blue')
     pf(x$mu,x$om.23,col='red')
     legend("topright",bty='n',fill=c("blue","red"),c("(1PL,2PL)","(2PL,3PL)"))
     ##
-    plot(NULL,xlim=xl,ylim=c(0,.02),ylab='Change in RMSEA',xlab=expression(mu)); abline(h=0,lty=2,col='gray')
+    plot(NULL,xlim=xl,ylim=c(0,.02),ylab='Change in RMSEA',xlab=expression(mu)); abline(h=0,lty=1,col='gray')
     pf(x$mu,x$rasch.rmsea-x$two.rmsea,col='blue')
     pf(x$mu,x$two.rmsea-x$three.rmsea,col='red')
     legend("topright",bty='n',fill=c("blue","red"),c("1PL-2PL","2PL-3PL"))
     ##
     y<-c(x$rasch.AIC-x$two.AIC,x$two.AIC-x$three.AIC)
     ran<-range(y)
-    plot(NULL,xlim=xl,ylim=ran,ylab='Change in AIC',xlab=expression(mu)); abline(h=0,lty=2,col='gray')
+    plot(NULL,xlim=xl,ylim=ran,ylab='Change in AIC',xlab=expression(mu)); abline(h=0,lty=1,col='gray')
     y<-x$rasch.AIC-x$two.AIC
     pf(x$mu,y,col='blue')
     y<-x$two.AIC-x$three.AIC
