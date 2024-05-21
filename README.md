@@ -41,7 +41,7 @@ Figures from the SI:
 ### Empirical examples
 Code supporting work with empirical data is [here](https://github.com/ben-domingue/irtimv/tree/main/irw). This paper uses data from the Item Response Warehouse ([IRW](https://datapages.github.io/irw/)). Figures from the main text are produced via:
 
-- 02_complexity.R computes unidimensinoal results.
+- 02_complexity.R computes unidimensional results.
 - 03_mirt.R comptues multidimensional results.
 - 04_figure.R produces figure 3.
 
